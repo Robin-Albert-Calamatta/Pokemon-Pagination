@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Button, PokemonCard, ErrorBlock, SelectBox } from "./../components";
+import { PokemonCard, ErrorBlock } from "./../components";
 import { ClassNames } from "@44north/classnames";
 import { useQuery, gql } from "@apollo/client";
-
 import type { IPokemonRecord } from "./../types";
 
+import Pagination from "./../components/Pagination";
 const POKEMON_QUERY = gql`
     query GetPokemon($pageNo: Int, $itemsPerPage: Int) {
         listPokemon(pageNo: $pageNo, itemsPerPage: $itemsPerPage) {
@@ -33,11 +33,9 @@ const POKEMON_QUERY = gql`
         }
     }
 `;
-
 function Homepage() {
     const [itemsPerPage, setItemsPerPage] = useState<number>(12);
     const [pageNo, setPageNo] = useState<number>(1);
-
     const { data, loading, error, refetch } = useQuery<{ listPokemon: IPokemonRecord[] }>(
         POKEMON_QUERY,
         {
@@ -49,16 +47,16 @@ function Homepage() {
     );
 
     useEffect(() => {
+        //fetch data
+
         refetch({
             pageNo,
             itemsPerPage
         });
     }, [pageNo, itemsPerPage]);
-
     return (
         <div className={new ClassNames(["flex", "flex-col", "space-y-4"]).list()}>
             {error && <ErrorBlock error={error} />}
-
             {loading ? (
                 <p>I am Loading...</p>
             ) : (data?.listPokemon || []).length === 0 ? (
@@ -72,7 +70,6 @@ function Homepage() {
                     ))}
                 </ul>
             )}
-
             <div
                 className={new ClassNames([
                     "flex",
@@ -80,21 +77,16 @@ function Homepage() {
                     "space-x-8"
                 ]).list()}
             >
-                <div className={new ClassNames(["flex", "space-x-2", "items-center"]).list()}>
-                    <Button onClick={() => setPageNo(pageNo - 1)}>Previous Page</Button>
-                    <p>{pageNo}</p>
-                    <Button onClick={() => setPageNo(pageNo + 1)}>Next Page</Button>
-                </div>
-                <div>
-                    <SelectBox
-                        value={itemsPerPage}
-                        onChange={(value) => setItemsPerPage(Number(value))}
-                        options={[1, 3, 6, 9, 12, 24, 48]}
-                    />
-                </div>
+                <Pagination
+                    pageNo={pageNo}
+                    setPageNo={setPageNo}
+                    loading={loading}
+                    data={data}
+                    setItemsPerPage={setItemsPerPage}
+                    itemsPerPage={itemsPerPage}
+                />
             </div>
         </div>
     );
 }
-
 export default Homepage;

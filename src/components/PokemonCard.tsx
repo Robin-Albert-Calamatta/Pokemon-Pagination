@@ -6,7 +6,12 @@ const PokemonCard: FC<{ data: IPokemonRecord; className?: string | ClassNames }>
     data,
     className = ""
 }) => {
-    return <div className={new ClassNames().add(className).list()}>{data.name}</div>;
+    return (
+        <>
+            {/* <div>{data.id}</div> */}
+            <div className={new ClassNames().add(className).list()}>{data.name}</div>
+        </>
+    );
 };
 
 export { PokemonCard };
